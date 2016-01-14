@@ -20,6 +20,7 @@ galaxy_info:
     - db
     - database
     - percona
+    - mysql
 
   categories:
   - db

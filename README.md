@@ -24,7 +24,7 @@ Role Variables
 	# cmake file version
 	CMAKE_VERSION: 2.8.11.2
 	
-	# cmake file
+	# cmake file tar url
 	CMAKE_FILE: http://pkgs.fedoraproject.org/repo/pkgs/cmake/cmake-{{CMAKE_VERSION}}.tar.gz/6f5d7b8e7534a5d9e1a7664ba63cf882/cmake-{{CMAKE_VERSION}}.tar.gz
 	
 	# percona server version
@@ -45,18 +45,16 @@ Example
 
 		- hosts: myhost
 		  roles:
-		  	 - role: ihaolin.percona-server-setup
-		  	   USER: mysql
-		  	   GROUP: mysql
-		  	   INSTALL_PATH: /mnt/mysql
-		  	   CMAKE_VERSION: 2.8.11.2
-		  	   CMAKE_FILE: http://... 
-		  	   PERCONA_SERVER_VERSION: 5.6.27-76.0
-		  	   PERCONA_SERVER_FILE: http://... 		  	   
+		    - role: ihaolin.percona-server-setup
+		      USER: mysql
+		      GROUP: mysql
+		      INSTALL_PATH: /mnt/mysql
+		      CMAKE_VERSION: 2.8.11.2
+		      CMAKE_FILE: http://... 
+		      PERCONA_SERVER_VERSION: 5.6.27-76.0
+		      PERCONA_SERVER_FILE: http://... 		  	   
 		  	   
 		    
-
-
 License
 -------
 
