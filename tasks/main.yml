@@ -1,0 +1,84 @@
+---
+# tasks file for ansible-role-percona-server-setup
+
+# prepare packages
+- name: 'prepare packages'
+  yum: name={{item}} state=present
+  with_items:
+     - gcc
+     - gcc-c++
+     - ncurses
+     - ncurses-devel
+     - readline-devel
+
+# setup account
+- name: 'setup group'
+  group: name={{GROUP}} state=present
+- name: 'setup user'
+  user: name={{USER}} group={{GROUP}} shell=/bin/nologin state=present
+
+# download cmake
+- name: 'download cmake...'
+  unarchive:
+    src={{CMAKE_FILE}}
+    dest=/tmp
+    copy=no
+
+# install cmake
+- name: 'install cmake...'
+  command: chdir=/tmp/cmake-{{CMAKE_VERSION}} {{item}}
+  with_items:
+     - ./configure
+     - make
+     - make install
+- file: src=/usr/local/bin/cmake dest=/usr/bin/cmake state=link
+- file: path=/tmp/cmake-{{CMAKE_VERSION}} state=absent
+
+# download percona
+- name: 'download percona...'
+  unarchive:
+    src={{PERCONA_SERVER_FILE}}
+    dest=/tmp
+    owner={{ansible_env.SUDO_USER}}
+    copy=no
+
+# make percona
+- name: 'install percona...'
+  command: chdir=/tmp/percona-server-{{PERCONA_SERVER_VERSION}} {{item}}
+  with_items:
+     - 'cmake . -DCMAKE_INSTALL_PREFIX={{INSTALL_PATH}} -DMYSQL_DATADIR={{INSTALL_PATH}}/data'
+     - make
+     - make install
+- file: path=/tmp/percona-server-{{PERCONA_SERVER_VERSION}} state=absent
+
+# setup mysql service
+- name: 'setup mysql service'
+  command: chdir={{INSTALL_PATH}} {{item}}
+  with_items:
+     - cp support-files/mysql.server /etc/init.d/mysqld
+     - chkconfig --add mysqld
+     - chkconfig mysqld on
+
+# init mysql conf
+- name: 'init conf'
+  template: src=my.j2 dest=/etc/my.cnf
+
+- file: path={{INSTALL_PATH}}/logs state=directory recurse=yes
+
+# init mysql
+- name: 'init mysql'
+  command: chdir={{INSTALL_PATH}} {{item}}
+  with_items:
+     - scripts/mysql_install_db --user={{USER}} --basedir={{INSTALL_PATH}} --datadir={{INSTALL_PATH}}/data
+
+- file: path={{INSTALL_PATH}} owner={{USER}} group={{GROUP}}
+
+- name: 'setup env'
+  lineinfile:
+    dest: /etc/profile
+    line: 'export {{item}}'
+  with_items:
+     - "PATH=$PATH:{{INSTALL_PATH}}/bin"
+
+- name: 'setup service'
+  service: name=mysqld state=started

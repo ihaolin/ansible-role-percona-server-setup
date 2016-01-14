@@ -1,0 +1,80 @@
+[mysqld]
+basedir = {{INSTALL_PATH}}
+datadir = {{INSTALL_PATH}}/data
+pid-file = {{INSTALL_PATH}}/mysql.pid
+character-set-server = utf8
+collation-server = utf8_general_ci
+user = mysql
+port = 3306
+binlog_format = mixed
+bind-address = 0.0.0.0
+lower_case_table_names = 1
+ft_min_word_len = 4
+skip-external-locking
+skip-name-resolve
+open_files_limit = 65535
+local_infile = 0
+
+# replication
+#server_id = 1
+#log_bin = mysql-bin
+#innodb_flush_log_at_trx_commit = 1
+#sync_binlog = 1
+
+# innodb
+default_storage_engine = InnoDB
+innodb-status-file
+innodb_file_per_table = 1
+innodb_additional_mem_pool_size = 16M
+innodb_buffer_pool_size = 4G
+innodb_data_file_path = ibdata1:1G:autoextend
+innodb_flush_log_at_trx_commit = 1
+innodb_log_buffer_size = 64M
+innodb_log_file_size = 256M
+innodb_log_files_in_group = 2
+
+# timeout setting
+interactive_timeout = 7200
+wait_timeout = 7200
+net_write_timeout = 180
+net_read_timeout = 180
+
+# cache
+query_cache_size = 64M
+query_cache_type = 1
+
+# limit
+max_allowed_packet = 16M
+max_heap_table_size = 64M
+
+# buffer
+sort_buffer_size = 2M
+join_buffer_size = 2M
+read_buffer_size = 2M
+read_rnd_buffer_size = 2M
+key_buffer_size = 16M
+net_buffer_length = 8K
+
+# log
+log_error = {{INSTALL_PATH}}/logs/mysql-error.log
+long_query_time = 5
+slow_query_log
+slow_query_log_file = {{INSTALL_PATH}}/logs/mysql-slow.log
+expire_logs_days = 7
+
+# connect
+max_connections = 240
+max_connect_errors = 200
+
+[mysqldump]
+quick
+max_allowed_packet = 64M
+
+[mysql]
+no-auto-rehash
+
+[mysqlhotcopy]
+interactive-timeout
+
+[client]
+port = 3306
